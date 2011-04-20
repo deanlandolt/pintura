@@ -1,1 +1,1 @@
-exports.parseMultipart = require("jack/utils").parseMultipart;
+exports.parseMultipart = require("./utils").parseMultipart;
