@@ -1,6 +1,6 @@
-var CSRFDetect = require("jsgi/csrf").CSRFDetect, 
-	assert = require("assert"),
-	print = require("promised-io/process").print;
+var CSRFDetect = require("../../lib/jsgi/csrf").CSRFDetect;
+var assert = require("assert");
+var print = require("promised-io/lib/process").print;
 	
 
 exports.testCSRF = function(){
@@ -9,5 +9,4 @@ exports.testCSRF = function(){
 	})({method:"POST", headers:{}});
 };
 
-if (require.main === module)
-    require("patr/runner").run(exports);
+if (require.main === module) require("patr/lib/test").run(exports);

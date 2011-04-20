@@ -1,10 +1,10 @@
-require("commonjs-utils/settings").admins = ["user"];// must do this first
-var MockRequest = require("jack/mock").MockRequest, 
-	mock = new MockRequest(require("pintura").app),
-	assert = require("assert"),
-	TestStore = require("perstore/stores").DefaultStore();
-	var config = require("pintura").config;
-	var parse = require("commonjs-utils/json-ext").parse;
+require("commonjs-utils/lib/settings").admins = ["user"];// must do this first
+var MockRequest = require("../lib/jsgi/mock").MockRequest, 
+var mock = new MockRequest(require("../lib/pintura").app);
+var assert = require("assert");
+var TestStore = require("perstore/lib/stores").DefaultStore();
+var config = require("../lib/pintura").config;
+var parse = require("commonjs-utils/lib/json-ext").parse;
 TestStore.setPath("TestStore");
 
 
@@ -15,36 +15,36 @@ var emptyApp = function(){
 		body:[]
 	} 
 };
-var lowerAppMock = new MockRequest(require("jsgi/context").SetContext({},
+var lowerAppMock = new MockRequest(require("../lib/jsgi/context").SetContext({},
 			// We detect if the request could have been forged from another site
 			require("jsgi/csrf").CSRFDetect(emptyApp)));
 				// Support handling various cross-site request mechanisms like JSONP, window.name, CS-XHR
-var lowerApp2Mock = new MockRequest(require("jsgi/xsite").CrossSite(
+var lowerApp2Mock = new MockRequest(require("../lib/jsgi/xsite").CrossSite(
 					// Handle header emulation through query parameters (useful for cross-site and links)
-					require("jsgi/http-params").HttpParams(emptyApp)));
+					require("../lib/jsgi/http-params").HttpParams(emptyApp)));
 						// Handle HEAD requests
-var lowerApp3Mock = new MockRequest(require("jsgi/head").Head(
+var lowerApp3Mock = new MockRequest(require("../lib/jsgi/head").Head(
 							// Add some useful headers
-							require("jsgi/pintura-headers").PinturaHeaders(config.serverName,
+							require("../lib/jsgi/pintura-headers").PinturaHeaders(config.serverName,
 								// Handle conditional requests
-								require("jsgi/conditional").Conditional(true,emptyApp
+								require("../lib/jsgi/conditional").Conditional(true,emptyApp
 								))));
-var middleAppMock = new MockRequest(require("jsgi/media").Serialize(config.mediaSelector,
+var middleAppMock = new MockRequest(require("../lib/jsgi/media").Serialize(config.mediaSelector,
 										// Handle errors that are thrown, converting to appropriate status codes
-										require("jsgi/error").ErrorHandler(
+										require("../lib/jsgi/error").ErrorHandler(
 											//	Handle transactions
-											require("perstore/jsgi/transactional").Transactional(
+											require("perstore/lib/jsgi/transactional").Transactional(
 												// Handle sessions
-												require("jsgi/session").Session({},
+												require("../lib/jsgi/session").Session({},
 													// Do authentication
-													require("jsgi/auth").Authentication(config.security, emptyApp))))));
+													require("../lib/jsgi/auth").Authentication(config.security, emptyApp))))));
 var upperAppMock = new MockRequest(require("jsgi/media").Deserialize(config.mediaSelector,
 															// Non-REST custom handlers
-															require('jsgi/routes').Routes(config.customRoutes,
+															require('../lib/jsgi/routes').Routes(config.customRoutes,
 																// Add and retrieve metadata from objects
-																exports.directApp = require("jsgi/metadata").Metadata(
+																exports.directApp = require("../lib/jsgi/metadata").Metadata(
 																	// Final REST handler
-																	require("jsgi/rest-store").RestStore(config)))));
+																	require("../lib/jsgi/rest-store").RestStore(config)))));
 var emptyMock = new MockRequest(emptyApp);
 config.getDataModel = function(){
 	return {
@@ -93,6 +93,5 @@ exports.testEmpty = function(){
 	assert.equal(body.length, 0);
 };
 
-if (require.main === module)
-    require("patr/runner").run(exports);
+if (require.main === module) require("patr/lib/test").run(exports);
 
